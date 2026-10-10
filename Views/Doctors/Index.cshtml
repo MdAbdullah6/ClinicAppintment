@@ -1,0 +1,33 @@
+@model List<Doctor>
+@{
+    ViewData["Title"] = "Doctors";
+    var specialties = (List<Specialty>)ViewBag.Specialties;
+    var selected = (int?)ViewBag.SelectedSpecialty;
+}
+<h2 class="mb-3">Our Doctors</h2>
+<div class="mb-4">
+    <a class="btn btn-sm @(selected == null ? "btn-primary" : "btn-outline-primary")" asp-action="Index">All</a>
+    @foreach (var s in specialties)
+    {
+        <a class="btn btn-sm @(selected == s.Id ? "btn-primary" : "btn-outline-primary")" asp-action="Index" asp-route-specialtyId="@s.Id">@s.Name</a>
+    }
+</div>
+<div class="row g-3">
+@foreach (var d in Model)
+{
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">@d.FullName</h5>
+                <span class="badge bg-info text-dark mb-2">@d.Specialty?.Name</span>
+                <p class="card-text text-muted">@d.Bio</p>
+                <p class="mb-1"><strong>Fee:</strong> @d.ConsultationFee.ToString("N0") BDT</p>
+                <p class="mb-0"><strong>Hours:</strong> @d.WorkStart.ToString(@"hh\:mm") - @d.WorkEnd.ToString(@"hh\:mm")</p>
+            </div>
+            <div class="card-footer bg-white border-0">
+                <a class="btn btn-primary w-100" asp-controller="Appointments" asp-action="Book" asp-route-doctorId="@d.Id">Book Appointment</a>
+            </div>
+        </div>
+    </div>
+}
+</div>

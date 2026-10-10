@@ -1,0 +1,39 @@
+@model BookViewModel
+@{ ViewData["Title"] = "Book Appointment"; }
+<h2>Book with @Model.Doctor.FullName</h2>
+<p class="text-muted">@Model.Doctor.Specialty?.Name &middot; @Model.Doctor.ConsultationFee.ToString("N0") BDT &middot; @Model.Doctor.SlotMinutes min slots</p>
+
+<form method="get" class="row g-2 mb-4">
+    <input type="hidden" name="doctorId" value="@Model.Doctor.Id" />
+    <div class="col-auto">
+        <input type="date" name="date" class="form-control" value="@Model.Date.ToString("yyyy-MM-dd")"
+               min="@DateTime.Today.ToString("yyyy-MM-dd")" max="@DateTime.Today.AddDays(60).ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto"><button class="btn btn-outline-primary">Check availability</button></div>
+</form>
+
+@if (!Model.Slots.Any())
+{
+    <div class="alert alert-warning">No free slots on @Model.Date.ToString("dddd, dd MMM yyyy"). Try another date.</div>
+}
+else
+{
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="doctorId" value="@Model.Doctor.Id" />
+        <h5>Available on @Model.Date.ToString("dddd, dd MMM yyyy")</h5>
+        <div class="mb-3">
+        @foreach (var s in Model.Slots)
+        {
+            var id = "slot" + s.ToString("HHmm");
+            <input type="radio" class="btn-check" name="start" id="@id" value="@s.ToString("yyyy-MM-ddTHH:mm")" required />
+            <label class="btn btn-outline-success m-1" for="@id">@s.ToString("hh:mm tt")</label>
+        }
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Reason for visit (optional)</label>
+            <textarea name="reason" class="form-control" rows="3" maxlength="300"></textarea>
+        </div>
+        <button class="btn btn-primary">Confirm Booking</button>
+    </form>
+}
